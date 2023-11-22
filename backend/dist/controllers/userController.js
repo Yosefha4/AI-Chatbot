@@ -43,7 +43,13 @@ export const userSignup = async (req, res, next) => {
             httpOnly: true,
             signed: true,
         });
-        return res.status(201).json({ message: "OK", id: newUser._id.toString() });
+        return res
+            .status(201)
+            .json({
+            message: "OK",
+            name: existingUser.name,
+            email: existingUser.email,
+        });
     }
     catch (error) {
         console.log(error);
@@ -72,16 +78,23 @@ export const userLogin = async (req, res, next) => {
         const token = createToken(existingUser._id.toString(), existingUser.email, "7d");
         const expires = new Date();
         expires.setDate(expires.getDate() + 7);
+        console.log("Token:", token);
+        console.log("Expires:", expires);
         res.cookie("auth_token", token, {
             path: "/",
             domain: "localhost",
             expires,
             httpOnly: true,
             signed: true,
+            sameSite: "none"
         });
         return res
-            .status(201)
-            .json({ message: "OK", id: existingUser._id.toString() });
+            .status(200)
+            .json({
+            message: "OK",
+            name: existingUser.name,
+            email: existingUser.email,
+        });
     }
     catch (error) {
         console.log(error);

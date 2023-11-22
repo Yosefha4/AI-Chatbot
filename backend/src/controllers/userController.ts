@@ -63,7 +63,13 @@ export const userSignup = async (
       signed: true,
     });
 
-    return res.status(201).json({ message: "OK", id: newUser._id.toString() });
+    return res
+      .status(201)
+      .json({
+        message: "OK",
+        name: existingUser.name,
+        email: existingUser.email,
+      });
   } catch (error) {
     console.log(error);
     return res.status(409).json({ message: "ERROR", cause: error.message });
@@ -86,7 +92,7 @@ export const userLogin = async (
     if (!isPasswordCorrect) {
       return res.status(403).send("Incorrect Password");
     }
-    
+
     //create token & store cookie
     res.clearCookie("auth_token", {
       httpOnly: true,
@@ -104,17 +110,25 @@ export const userLogin = async (
     const expires = new Date();
     expires.setDate(expires.getDate() + 7);
 
+    console.log("Token:", token);
+    console.log("Expires:", expires);
+
     res.cookie("auth_token", token, {
       path: "/",
       domain: "localhost",
       expires,
       httpOnly: true,
       signed: true,
+      sameSite:"none"
     });
 
     return res
-      .status(201)
-      .json({ message: "OK", id: existingUser._id.toString() });
+      .status(200)
+      .json({
+        message: "OK",
+        name: existingUser.name,
+        email: existingUser.email,
+      });
   } catch (error) {
     console.log(error);
     return res.status(409).json({ message: "ERROR", cause: error.message });
